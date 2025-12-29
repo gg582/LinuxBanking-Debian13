@@ -1,0 +1,37 @@
+diff -ruN origin/DEBIAN/control extract/DEBIAN/control
+--- origin/DEBIAN/control	2024-03-18 14:54:35.000000000 +0900
++++ extract/DEBIAN/control	2025-10-11 11:30:23.000000000 +0900
+@@ -3,7 +3,7 @@
+ Architecture: amd64
+ Maintainer: INTEREZEN Co., Ltd. <developer@interezen.co.kr>
+ Installed-Size: 30000
+-Depends: libstdc++6, ethtool, policykit-1, libnss3-tools, net-tools
++Depends: libstdc++6, ethtool, polkitd, libnss3-tools, net-tools
+ Section: web
+ Priority: extra
+ Homepage: http://www.interezen.co.kr/
+diff -ruN origin/DEBIAN/postinst extract/DEBIAN/postinst
+--- origin/DEBIAN/postinst	2022-07-11 15:32:43.000000000 +0900
++++ extract/DEBIAN/postinst	2025-10-11 11:36:30.000000000 +0900
+@@ -21,8 +21,8 @@
+ 			profilePath="$ROOTFIRFOX"/${line#"Path="}
+ 			if [ -d "$profilePath" ]; then
+ 				if [ -f "$profilePath/cert8.db" ] ; then	
+-					certutil -D -n "${certificateName}" -d "${profilePath}" || :
+-					certutil -A -n "${certificateName}" -t "TCu,Cuw,Tuw" -i ${certificateFile} -d "${profilePath}" || :
++					certutil -D -n "${certificateName}" -d "$sql:{profilePath}" || :
++					certutil -A -n "${certificateName}" -t "TCu,Cuw,Tuw" -i ${certificateFile} -d "sql:${profilePath}" || :
+ 				fi
+ 				if [ -f "$profilePath/cert9.db" ] ; then	
+ 					certutil -D -n "${certificateName}" -d "sql:${profilePath}" || :
+@@ -119,8 +119,8 @@
+ 		certDir=$(dirname ${certDB});
+ 
+ 		echo $certDir
+-		certutil -D -n "${certificateName}" -d sql:${certDir};
+-		certutil -A -n "${certificateName}" -t "CP,CP," -i ${certificateFile} -d sql:${certDir};
++		certutil -D -n "${certificateName}" -d sql:${certDir} || :
++		certutil -A -n "${certificateName}" -t "CP,CP," -i ${certificateFile} -d sql:${certDir} || :
+ 	done
+ done
+ # ---------------------------------------------------------------------------------------------------------
